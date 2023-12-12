@@ -1,22 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strings"
 )
 
 func (rdb *RailwaysDB) createStation() (*Station, error) {
 	var station StationCreate
-
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("city: ")
-	station.City, _ = reader.ReadString('\n')
-	station.City = strings.TrimSpace(station.City)
-	fmt.Print("name: ")
-	station.Name, _ = reader.ReadString('\n')
-	station.Name = strings.TrimSpace(station.Name)
+	station.City = readString("city: ")
+	station.Name = readString("name:")
 
 	stmt, err := rdb.db.Prepare("INSERT INTO stations(city, name) VALUES(?, ?)")
 	if err != nil {
@@ -66,6 +57,10 @@ func (rdb *RailwaysDB) getAllStations() (*[]Station, error) {
 }
 
 func (rdb *RailwaysDB) getStationById(id int64) (*Station, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id: %d", id)
+	}
+
 	s := &Station{}
 	query := `SELECT * FROM stations WHERE station_id = ?`
 	err := rdb.db.QueryRow(query, id).Scan(&s.Id, &s.City, &s.Name)
@@ -78,15 +73,9 @@ func (rdb *RailwaysDB) getStationById(id int64) (*Station, error) {
 func (rdb *RailwaysDB) updateStation() (*Station, error) {
 	var station Station
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("id: ")
-	fmt.Scanf("%d", &station.Id)
-	fmt.Print("city: ")
-	station.City, _ = reader.ReadString('\n')
-	station.City = strings.TrimSpace(station.City)
-	fmt.Print("name: ")
-	station.Name, _ = reader.ReadString('\n')
-	station.Name = strings.TrimSpace(station.Name)
+	station.Id = int64(readInt("id: "))
+	station.City = readString("city: ")
+	station.Name = readString("name: ")
 
 	query := `UPDATE stations SET city = ?, name = ? WHERE station_id = ?`
 	res, err := rdb.db.Exec(query, station.City, station.Name, station.Id)
@@ -107,6 +96,10 @@ func (rdb *RailwaysDB) updateStation() (*Station, error) {
 }
 
 func (rdb *RailwaysDB) deleteStation(id int64) error {
+	if id <= 0 {
+		return fmt.Errorf("invalid id: %d", id)
+	}
+
 	query := `DELETE FROM stations WHERE station_id = ?`
 	res, err := rdb.db.Exec(query, id)
 	if err != nil {

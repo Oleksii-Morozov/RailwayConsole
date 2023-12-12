@@ -39,7 +39,7 @@ func main() {
 
 	db, err := sql.Open("mysql", connectionString)
 	if err != nil {
-		fmt.Printf("Error opening database: %s", err)
+		fmt.Println("Error opening database: ", err)
 		return
 	}
 	defer db.Close()
@@ -61,113 +61,123 @@ func main() {
 		case "cs":
 			station, err := rdb.createStation()
 			if err != nil {
-				fmt.Printf("Error creating station: %s", err)
+				fmt.Println("Error creating station: ", err)
+			} else {
+				fmt.Println("Station created:")
+				fmt.Println("Id City Name")
+				fmt.Println(station.Id, station.City, station.Name)
 			}
-			fmt.Println("Station created:")
-			fmt.Println("Id City Name")
-			fmt.Println(station.Id, station.City, station.Name)
 		case "gss":
 			stations, err := rdb.getAllStations()
 			if err != nil {
-				fmt.Printf("Error getting stations: %s", err)
-			}
-			fmt.Println("Stations:")
-			fmt.Println("Id City Name")
-			for _, station := range *stations {
-				fmt.Println(station.Id, station.City, station.Name)
+				fmt.Println("Error getting stations: ", err)
+			} else {
+				fmt.Println("Stations:")
+				fmt.Println("Id City Name")
+				for _, station := range *stations {
+					fmt.Println(station.Id, station.City, station.Name)
+				}
 			}
 		case "gs":
 			id := readInt("Enter station id: ")
 			station, err := rdb.getStationById(int64(id))
 			if err != nil {
-				fmt.Printf("Error getting station: %s", err)
+				fmt.Println("Error getting station: ", err)
+			} else {
+				fmt.Print("Station:")
+				fmt.Println("Id City Name")
+				fmt.Println(station.Id, station.City, station.Name)
 			}
-			fmt.Print("Station:")
-			fmt.Println("Id City Name")
-			fmt.Println(station.Id, station.City, station.Name)
 		case "us":
-			station, error := rdb.updateStation()
-			if error != nil {
-				fmt.Printf("Error updating station: %s", error)
+			station, err := rdb.updateStation()
+			if err != nil {
+				fmt.Println("Error updating station: ", err)
+			} else {
+				fmt.Println("Station updated:")
+				fmt.Println("Id City Name")
+				fmt.Println(station.Id, station.City, station.Name)
 			}
-			fmt.Println("Station updated:")
-			fmt.Println("Id City Name")
-			fmt.Println(station.Id, station.City, station.Name)
 		case "ds":
 			id := readInt("Enter station id: ")
 			err := rdb.deleteStation(int64(id))
 			if err != nil {
-				fmt.Printf("Error deleting station: %s", err)
+				fmt.Println("Error deleting station: ", err)
+			} else {
+				fmt.Println("Station deleted")
 			}
-			fmt.Println("Station deleted")
 		case "ct":
 			train, err := rdb.createTrain()
 			if err != nil {
-				fmt.Printf("Error creating train: %s", err)
+				fmt.Println("Error creating train: ", err)
+			} else {
+				fmt.Println("Train created:")
+				fmt.Println("Id Code Capacity")
+				fmt.Println(train.Id, train.Code, train.Capacity)
 			}
-			fmt.Println("Train created:")
-			fmt.Println("Id Code Capacity")
-			fmt.Println(train.Id, train.Code, train.Capacity)
 		case "gts":
 			trains, err := rdb.getAllTrains()
 			if err != nil {
-				fmt.Printf("Error getting trains: %s", err)
-			}
-			fmt.Println("Trains:")
-			fmt.Println("Id Code Capacity")
-			for _, train := range *trains {
-				fmt.Println(train.Id, train.Code, train.Capacity)
+				fmt.Println("Error getting trains: ", err)
+			} else {
+				fmt.Println("Trains:")
+				fmt.Println("Id Code Capacity")
+				for _, train := range *trains {
+					fmt.Println(train.Id, train.Code, train.Capacity)
+				}
 			}
 		case "gt":
 			id := readInt("Enter train id: ")
 			train, err := rdb.getTrainById(int64(id))
 			if err != nil {
-				fmt.Printf("Error getting train: %s", err)
+				fmt.Println("Error getting train: ", err)
+			} else {
+				fmt.Print("Train:")
+				fmt.Println("Id Code Capacity")
+				fmt.Println(train.Id, train.Code, train.Capacity)
 			}
-			fmt.Print("Train:")
-			fmt.Println("Id Code Capacity")
-			fmt.Println(train.Id, train.Code, train.Capacity)
 		case "ut":
 			train, error := rdb.updateTrain()
 			if error != nil {
-				fmt.Printf("Error updating train: %s", error)
+				fmt.Println("Error updating train: ", error)
+			} else {
+				fmt.Println("Train updated:")
+				fmt.Println("Id Code Capacity")
+				fmt.Println(train.Id, train.Code, train.Capacity)
 			}
-			fmt.Println("Train updated:")
-			fmt.Println("Id Code Capacity")
-			fmt.Println(train.Id, train.Code, train.Capacity)
 		case "dt":
 			id := readInt("Enter train id: ")
 			err := rdb.deleteTrain(int64(id))
 			if err != nil {
-				fmt.Printf("Error deleting train: %s", err)
+				fmt.Println("Error deleting train: ", err)
+			} else {
+				fmt.Println("Train deleted")
 			}
-			fmt.Println("Train deleted")
 		case "cp":
 			id := readInt("Enter amount of seats: ")
 			before, err := rdb.countRows(context.Background(), "seats")
 			if err != nil {
-				fmt.Printf("Error counting rows: %s", err)
+				fmt.Println("Error counting rows: ", err)
 			}
-			fmt.Printf("Amount of rows before call procedure: %d\n", before)
+			fmt.Println("Amount of rows before call procedure: ", before)
 			err = rdb.callProcedure(int64(id))
 			if err != nil {
-				fmt.Printf("Error calling procedure: %s", err)
+				fmt.Println("Error calling procedure: ", err)
 			}
 			fmt.Println("Procedure called")
 			after, err := rdb.countRows(context.Background(), "seats")
 			if err != nil {
-				fmt.Printf("Error counting rows: %s", err)
+				fmt.Println("Error counting rows: ", err)
 			}
-			fmt.Printf("Amount of rows after call procedure: %d\n", after)
+			fmt.Println("Amount of rows after call procedure: ", after)
 		case "snrr":
 			level := readInt("Enter isolation level (1: Read Uncommitted, 2: Read Committed, 3: Repeatable Read, 4: Serializable): ")
 			if err != nil {
-				fmt.Printf("Invalid level: %d", level)
+				fmt.Println("Invalid level: ", level)
 				continue
 			}
 			err = rdb.simulateNonRepeatableRead(levelsMap[level])
 			if err != nil {
-				fmt.Printf("Error simulating non-repeatable read: %s", err)
+				fmt.Println("Error simulating non-repeatable read: ", err)
 			}
 		default:
 			fmt.Println("Invalid command")
@@ -250,6 +260,8 @@ func (rdb *RailwaysDB) simulateNonRepeatableRead(level sql.IsolationLevel) error
 		fmt.Println("\nTransaction 2: Committed")
 	}()
 
+	time.Sleep(5 * time.Second) // Wait for the transactions to finish
+
 	return nil
 }
 
@@ -275,4 +287,11 @@ func readInt(msg string) int {
 		return -1
 	}
 	return id
+}
+
+func readString(msg string) string {
+	fmt.Print(msg)
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(input)
+	return input
 }

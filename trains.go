@@ -1,21 +1,10 @@
 package main
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-	"strings"
-)
-
 func (rdb *RailwaysDB) createTrain() (*Train, error) {
 	var train TrainCreate
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("code: ")
-	train.Code, _ = reader.ReadString('\n')
-	train.Code = strings.TrimSpace(train.Code)
-	fmt.Print("capacity: ")
-	fmt.Scanf("%d", &train.Capacity)
+	train.Code = readString("code: ")
+	train.Capacity = readInt("capacity: ")
 
 	stmt, err := rdb.db.Prepare("INSERT INTO trains(code, capacity) VALUES(?, ?)")
 	if err != nil {
@@ -74,12 +63,9 @@ func (rdb *RailwaysDB) getTrainById(id int64) (*Train, error) {
 func (rdb *RailwaysDB) updateTrain() (*Train, error) {
 	var train Train
 
-	fmt.Print("id: ")
-	fmt.Scanf("%d", &train.Id)
-	fmt.Print("code: ")
-	fmt.Scanf("%s", &train.Code)
-	fmt.Print("capacity: ")
-	fmt.Scanf("%d", &train.Capacity)
+	train.Id = int64(readInt("id"))
+	train.Code = readString("code")
+	train.Capacity = readInt("capacity")
 
 	stmt, err := rdb.db.Prepare("UPDATE trains SET code = ?, capacity = ? WHERE train_id = ?")
 	if err != nil {
